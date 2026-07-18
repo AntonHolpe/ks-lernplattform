@@ -107,6 +107,12 @@
     .score{margin-left:0;width:100%;text-align:right}
     h2{font-size:17px}
   }
+  .fcprogress{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin:0 auto 8px;max-width:560px}
+  .fcfill{height:100%;background:var(--accent);width:0;transition:width .3s}
+  .fcstat{text-align:center;color:var(--muted);font-size:13px;margin-bottom:10px;font-variant-numeric:tabular-nums}
+  .flash .full{font-size:18px;font-weight:700;margin-bottom:8px}
+  button.btn:disabled{opacity:.45;cursor:default}
+  button.btn.good{background:var(--good);border-color:var(--good);color:#fff}
 </style>
 
 <div class="wrap">
@@ -142,20 +148,21 @@
   <section class="panel" id="p-cards">
     <div class="card">
       <h2>Karteikarten – alle Protokolle</h2>
-      <p class="sub">Vorderseite: Protokoll. Rückseite: Schicht + Funktion. Klick zum Umdrehen.</p>
+      <p class="sub">Vorderseite: Kürzel. Rückseite: voller Name, Schicht und Funktion. Tippen zum Umdrehen. Markiere „Kann ich", bis alle durch sind.</p>
       <div class="fcwrap">
+        <div class="fcprogress"><div class="fcfill" id="fcFill"></div></div>
+        <div class="fcstat" id="fcStat"></div>
         <div class="flash" id="flash">
           <div class="inner">
-            <div class="face front"><div class="q" id="fcQ"></div><div class="tip">Klicken zum Umdrehen</div></div>
-            <div class="face back"><div class="a" id="fcA"></div><div class="tip">Klicken zum Umdrehen</div></div>
+            <div class="face front"><div class="q" id="fcQ"></div><div class="tip">Tippen zum Umdrehen</div></div>
+            <div class="face back"><div class="a" id="fcA"></div><div class="tip">Tippen zum Umdrehen</div></div>
           </div>
         </div>
         <div class="fcbar">
-          <button class="btn" id="fcPrev">‹ Zurück</button>
-          <span class="pos" id="fcPos"></span>
-          <button class="btn" id="fcNext">Weiter ›</button>
-          <button class="btn" id="fcShuf">Mischen</button>
+          <button class="btn" id="fcAgain">↻ Nochmal</button>
+          <button class="btn good" id="fcKnow">✓ Kann ich</button>
         </div>
+        <div class="fcbar"><button class="btn" id="fcReset">Fortschritt zurücksetzen</button></div>
       </div>
     </div>
   </section>
@@ -328,40 +335,40 @@ const DECKS=[
   {id:"stuff",title:"Folie: Byte Stuffing",items:["bytestuff"]}
 ];
 const CARDS=[
-  {n:"Ethernet II",lay:"l2",t:"Schicht 2 (Network Interface)",fn:"LAN frame format: 6-byte destination + 6-byte source address, 2-byte type, payload, 4-byte CRC. fol 05"},
-  {n:"IEEE 802.3",lay:"l2",t:"Schicht 2 (Network Interface)",fn:"IEEE Ethernet standard: type field = length, + 8-byte LLC/SNAP. Genutzt u. a. von 802.11. fol 05"},
-  {n:"IEEE 802.11 / WLAN",lay:"l2",t:"Schicht 2 (Network Interface)",fn:"WiFi, Medienzugriff per CSMA/CA, bis zu 4 MAC-Adressen im Frame. fol 05"},
-  {n:"ARP",lay:"l2",t:"Schicht 2 (Network Interface)",fn:"Address Resolution Protocol: löst IP-Adresse → MAC-Adresse auf. fol 10 (\"ARP ist Layer 2\")"},
-  {n:"IP / IPv4",lay:"l3",t:"Schicht 3 (Internet)",fn:"Verbindungslos, best-effort, virtuelle/universelle Pakete, Weiterleitung über Router anhand Zieladresse, zwischen Netzen. fol 08/09"},
-  {n:"IPv6",lay:"l3",t:"Schicht 3 (Internet)",fn:"Nachfolger von IPv4, 128-bit Adressen, 40-byte base header + extension header. fol 09"},
-  {n:"ICMP",lay:"l3",t:"Schicht 3 (Internet)",fn:"Control/error messages für best-effort IP, in IP-Payload gekapselt (ICMPv4/ICMPv6). fol 10"},
-  {n:"DHCP",lay:"l5",t:"Konfiguration / Anwendung, nutzt UDP",fn:"Dynamische Vergabe von IP-Konfiguration (request/response). fol 10"},
-  {n:"RIP",lay:"lx",t:"Routing-Protokoll (IGP), nutzt UDP",fn:"Distance Vector, hop-count metric, Routing innerhalb eines AS. fol 12"},
-  {n:"OSPF",lay:"lx",t:"Routing-Protokoll (IGP)",fn:"Link State, Metriken, OSPFv3 für IPv6, Multi-Access-Unterstützung. fol 12"},
-  {n:"BGP",lay:"lx",t:"Routing-Protokoll (EGP), nutzt TCP",fn:"Zwischen Autonomen Systemen, transit/stub, von Tier-1-ISPs genutzt. fol 12"},
-  {n:"TCP",lay:"l4",t:"Schicht 4 (Transport)",fn:"Verbindungsorientiert, zuverlässig, byte stream, full duplex, flow & congestion control, 3-way handshake. fol 11/12"},
-  {n:"UDP",lay:"l4",t:"Schicht 4 (Transport)",fn:"Verbindungslos, best-effort, message-oriented, minimal (8-byte header), keine flow/congestion control. fol 11"},
-  {n:"HTTP",lay:"l5",t:"Schicht 5 (Application)",fn:"Web protocol, nutzt TCP. fol 03"},
-  {n:"DNS",lay:"l5",t:"Schicht 5 (Application)",fn:"Namensauflösung Domain → IP. fol 03"},
-  {n:"FTP / IMAP",lay:"l5",t:"Schicht 5 (Application)",fn:"File transfer / mail access, jede Anwendung implementiert eigenes Protokoll. fol 02/03"},
-  {n:"NAT / NAPT",lay:"l3",t:"Schicht 3 (NAPT auch 4)",fn:"Network Address Translation am Übergang Internet↔Standort: übersetzt private (nonroutable) Adressen ausgehender Datagramme in eine globale. fol 10"},
-  {n:"STP – Spanning Tree Protocol",lay:"l2",t:"Schicht 2 (Network Interface)",fn:"Distributed Spanning Tree zwischen Bridges: verhindert Schleifen (endlose Broadcasts); Bridges kommunizieren über Multicast 01:80:C2:00:00:00. fol 06"},
-  {n:"SMTP",lay:"l5",t:"Schicht 5 (Application)",fn:"Simple Mail Transfer Protocol: Transfer von E-Mails zur Mailbox des Empfängers. fol 03"},
-  {n:"POP3 / IMAP",lay:"l5",t:"Schicht 5 (Application)",fn:"Remote-Zugriff auf die Mailbox des Nutzers (Abholen/Verwalten von E-Mail). fol 03"},
-  {n:"IPv6 Neighbour Discovery",lay:"l3",t:"Schicht 3 (Internet), nutzt ICMPv6",fn:"IPv6-ND: Ersatz für ARP in IPv6, Auflösung und Erreichbarkeit von Nachbarn. fol 10"},
-  {n:"ICMPv6",lay:"l3",t:"Schicht 3 (Internet)",fn:"ICMP-Variante für IPv6 (Fehler-/Kontrollnachrichten, u. a. für Neighbour Discovery). fol 10"},
-  {n:"IPv6 Autoconfiguration (SLAAC) / DHCPv6",lay:"l3",t:"Schicht 3 / Konfiguration",fn:"Automatische Generierung einer eindeutigen IPv6-Adresse (stateless SLAAC), bzw. DHCPv6 (stateful). fol 10"},
-  {n:"Token Ring",lay:"l2",t:"Schicht 2 (Network Interface)",fn:"IBM Token Ring (~16 Mbps): Ring-Topologie mit Token Passing als Medienzugriff. fol 06"},
-  {n:"FDDI / CDDI",lay:"l2",t:"Schicht 2 (Network Interface)",fn:"Fiber Distributed Data Interface: Glasfaser-Ring mit gegenläufigen Ringen (Redundanz); CDDI = Variante über Kupfer. fol 06"},
-  {n:"WiMAX (IEEE 802.16)",lay:"l2",t:"Schicht 1/2 (MAN)",fn:"Metropolitan Area Network per Funk, Zellradius bis 10 km; Fixed/Mobile WiMAX. fol 05"},
-  {n:"Bluetooth (IEEE 802.15.1)",lay:"l2",t:"Schicht 1/2 (PAN)",fn:"Personal Area Network: Kommunikation von Peripheriegeräten mit dem Rechner. fol 05"},
-  {n:"ZigBee (IEEE 802.15.4)",lay:"l2",t:"Schicht 1/2 (PAN)",fn:"Personal Area Network für Heimautomation (stromsparend). fol 05"},
-  {n:"VSAT",lay:"lx",t:"Schicht 1 (Physical)",fn:"Very Small Aperture Terminal: Satellitenkommunikation über kleine Bodenstationen. fol 05"},
-  {n:"GPS",lay:"lx",t:"Schicht 1 (Physical)",fn:"Positions-/Zeitbestimmung per Satellit (kein Kommunikationsprotokoll im engeren Sinn). fol 05"},
-  {n:"Software Defined Radio (SDR)",lay:"lx",t:"Schicht 1 (Physical)",fn:"Funkübertragung, deren Signalverarbeitung per Software statt fester Hardware erfolgt. fol 05"},
-  {n:"RIPng",lay:"lx",t:"Routing (IGP), über UDP",fn:"RIP next generation: IPv6-Variante von RIP (Distance Vector). fol 12"},
-  {n:"IS-IS",lay:"lx",t:"Routing-Protokoll (IGP)",fn:"Link-State IGP, Alternative zu OSPF (mögliches IGP neben RIP/OSPF). fol 12"},
-  {n:"QUIC",lay:"l4",t:"Schicht 4 (Transport), für HTTP/3",fn:"Transportprotokoll, u. a. von Google/BBR für HTTP/3 genutzt (google.com-Suche, YouTube). fol 13"}
+  {n:"Ethernet II",full:"Ethernet II (Ethernet-Frame-Format)",lay:"l2",t:"Schicht 2 (Network Interface)",fn:"Häufigstes LAN-Frame-Format: 6-byte destination + 6-byte source address, 2-byte type (nennt das Schicht-3-Protokoll), payload, 4-byte CRC. fol 05"},
+  {n:"IEEE 802.3",full:"IEEE 802.3 (IEEE-Ethernet-Standard)",lay:"l2",t:"Schicht 2 (Network Interface)",fn:"IEEE-Variante von Ethernet: type-Feld wird als Länge interpretiert, zusätzlich 8-byte LLC/SNAP-Header. Format u. a. von 802.11 genutzt. fol 05"},
+  {n:"IEEE 802.11 / WLAN",full:"IEEE 802.11 (Wireless LAN / WiFi)",lay:"l2",t:"Schicht 2 (Network Interface)",fn:"Drahtloses LAN; Medienzugriff per CSMA/CA; Frame mit bis zu 4 MAC-Adressen (Weiterleitung über Access Point). fol 05"},
+  {n:"ARP",full:"Address Resolution Protocol",lay:"l2",t:"Schicht 2 (Network Interface)",fn:"Löst eine IP-Adresse in die zugehörige MAC-Adresse auf (Broadcast-Anfrage im lokalen Netz). fol 10"},
+  {n:"IP / IPv4",full:"Internet Protocol (Version 4)",lay:"l3",t:"Schicht 3 (Internet)",fn:"Verbindungsloser Best-Effort-Dienst; virtuelle/universelle Pakete (Datagramme); Weiterleitung über Router anhand der Zieladresse, zwischen Netzen. fol 08/09"},
+  {n:"IPv6",full:"Internet Protocol Version 6",lay:"l3",t:"Schicht 3 (Internet)",fn:"Nachfolger von IPv4: 128-bit-Adressen, 40-byte Base Header + optionale Extension Header (verkettet über Next Header). fol 09"},
+  {n:"ICMP",full:"Internet Control Message Protocol",lay:"l3",t:"Schicht 3 (Internet)",fn:"Kontroll-/Fehlernachrichten für das Best-Effort-IP (z. B. Echo, Destination Unreachable, Time Exceeded); in IP-Payload gekapselt. fol 10"},
+  {n:"DHCP",full:"Dynamic Host Configuration Protocol",lay:"l5",t:"Konfiguration / Anwendung (nutzt UDP)",fn:"Vergibt Clients automatisch IP-Konfiguration (Adresse, Maske, Default-Router) per Request/Response. fol 10"},
+  {n:"RIP",full:"Routing Information Protocol",lay:"lx",t:"Routing (IGP), nutzt UDP",fn:"Distance-Vector-IGP mit Hop-Count-Metrik; Routing innerhalb eines AS; tauscht Distanzvektoren mit Nachbarn. fol 12"},
+  {n:"OSPF",full:"Open Shortest Path First",lay:"lx",t:"Routing (IGP)",fn:"Link-State-IGP: jeder Router kennt die Topologie und berechnet kürzeste Pfade (Dijkstra); OSPFv3 für IPv6. fol 12"},
+  {n:"BGP",full:"Border Gateway Protocol",lay:"lx",t:"Routing (EGP), nutzt TCP",fn:"Routing zwischen Autonomen Systemen (EGP); Transit-/Stub-Systeme; von Tier-1-ISPs genutzt. fol 12"},
+  {n:"TCP",full:"Transmission Control Protocol",lay:"l4",t:"Schicht 4 (Transport)",fn:"Verbindungsorientiert, zuverlässig, Byte-Stream, Full-Duplex; Fluss- und Überlastkontrolle; 3-Way-Handshake. fol 11/12"},
+  {n:"UDP",full:"User Datagram Protocol",lay:"l4",t:"Schicht 4 (Transport)",fn:"Verbindungslos, Best-Effort, nachrichtenorientiert, minimal (8-byte-Header); keine Fluss-/Überlastkontrolle. fol 11"},
+  {n:"HTTP",full:"Hypertext Transfer Protocol",lay:"l5",t:"Schicht 5 (Application)",fn:"Web-Protokoll (Request/Response) zum Abruf von Webseiten; nutzt TCP. fol 03"},
+  {n:"DNS",full:"Domain Name System",lay:"l5",t:"Schicht 5 (Application)",fn:"Übersetzt Domainnamen in IP-Adressen (Namensauflösung). fol 03"},
+  {n:"FTP",full:"File Transfer Protocol",lay:"l5",t:"Schicht 5 (Application)",fn:"Protokoll zur Dateiübertragung zwischen Rechnern. fol 02/03"},
+  {n:"NAT / NAPT",full:"Network Address (and Port) Translation",lay:"l3",t:"Schicht 3 (NAPT auch 4)",fn:"Am Übergang Internet↔Standort: übersetzt private (nonroutable) Adressen ausgehender Pakete in eine globale; NAPT zusätzlich über Ports, damit viele Hosts eine öffentliche IP teilen. fol 10"},
+  {n:"STP",full:"Spanning Tree Protocol",lay:"l2",t:"Schicht 2 (Network Interface)",fn:"Bridges berechnen einen Spanning Tree, um Schleifen (endlose Broadcasts) zu verhindern; Kommunikation über Multicast 01:80:C2:00:00:00. fol 06"},
+  {n:"SMTP",full:"Simple Mail Transfer Protocol",lay:"l5",t:"Schicht 5 (Application)",fn:"Transportiert E-Mails über das Internet zur Mailbox des Empfängers. fol 03"},
+  {n:"POP3 / IMAP",full:"Post Office Protocol 3 / Internet Message Access Protocol",lay:"l5",t:"Schicht 5 (Application)",fn:"Remote-Zugriff auf die Mailbox: POP3 lädt Mails herunter, IMAP verwaltet sie auf dem Server. fol 03"},
+  {n:"IPv6-ND",full:"IPv6 Neighbour Discovery",lay:"l3",t:"Schicht 3 (Internet), nutzt ICMPv6",fn:"Ersatz für ARP in IPv6: Auflösung von Nachbaradressen und Erreichbarkeitsprüfung. fol 10"},
+  {n:"ICMPv6",full:"Internet Control Message Protocol for IPv6",lay:"l3",t:"Schicht 3 (Internet)",fn:"ICMP-Variante für IPv6; trägt u. a. die Neighbour-Discovery-Nachrichten. fol 10"},
+  {n:"SLAAC / DHCPv6",full:"Stateless Address Autoconfiguration / DHCP für IPv6",lay:"l3",t:"Schicht 3 / Konfiguration",fn:"Automatische IPv6-Adressvergabe: SLAAC ohne Server (stateless), DHCPv6 mit Server (stateful). fol 10"},
+  {n:"Token Ring",full:"Token Ring (IEEE 802.5)",lay:"l2",t:"Schicht 2 (Network Interface)",fn:"Ring-LAN (IBM, ~16 Mbps): nur wer den Token besitzt, darf senden (Token Passing). fol 06"},
+  {n:"FDDI / CDDI",full:"Fiber (/ Copper) Distributed Data Interface",lay:"l2",t:"Schicht 2 (Network Interface)",fn:"Glasfaser-Ring mit zwei gegenläufigen Ringen für Redundanz; CDDI ist die Kupfer-Variante. fol 06"},
+  {n:"WiMAX",full:"Worldwide Interoperability for Microwave Access (IEEE 802.16)",lay:"l2",t:"Schicht 1/2 (MAN)",fn:"Funk-MAN mit großer Reichweite (Zellradius bis 10 km); Fixed und Mobile WiMAX. fol 05"},
+  {n:"Bluetooth",full:"Bluetooth (IEEE 802.15.1)",lay:"l2",t:"Schicht 1/2 (PAN)",fn:"Kurzstrecken-Funk (Personal Area Network) zur Anbindung von Peripheriegeräten an den Rechner. fol 05"},
+  {n:"ZigBee",full:"ZigBee (IEEE 802.15.4)",lay:"l2",t:"Schicht 1/2 (PAN)",fn:"Stromsparendes PAN für Heimautomation/Sensorik (niedrige Datenrate, lange Batterielaufzeit). fol 05"},
+  {n:"VSAT",full:"Very Small Aperture Terminal",lay:"lx",t:"Schicht 1 (Physical)",fn:"Satellitenkommunikation über kleine Bodenstationen (Antennen mit kleiner Apertur), z. B. für abgelegene Standorte. fol 05"},
+  {n:"GPS",full:"Global Positioning System",lay:"lx",t:"Schicht 1 (Physical)",fn:"Satellitengestützte Positions- und Zeitbestimmung; strenggenommen kein Kommunikationsprotokoll. fol 05"},
+  {n:"SDR",full:"Software Defined Radio",lay:"lx",t:"Schicht 1 (Physical)",fn:"Funksystem, dessen Modulation/Signalverarbeitung in Software statt fester Hardware läuft (flexibel für viele Standards). fol 05"},
+  {n:"RIPng",full:"RIP next generation",lay:"lx",t:"Routing (IGP), nutzt UDP",fn:"IPv6-Variante von RIP (Distance Vector). fol 12"},
+  {n:"IS-IS",full:"Intermediate System to Intermediate System",lay:"lx",t:"Routing (IGP)",fn:"Link-State-IGP, Alternative zu OSPF (mögliches IGP neben RIP und OSPF). fol 12"},
+  {n:"QUIC",full:"QUIC (Quick UDP Internet Connections)",lay:"l4",t:"Schicht 4 (Transport), für HTTP/3",fn:"Transportprotokoll über UDP; von Google/BBR für HTTP/3 genutzt (google.com-Suche, YouTube). fol 13"}
 ];
 
 const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
@@ -467,11 +474,25 @@ function checkAll(){
 }
 function showSol(){document.querySelectorAll("#trainArea input.gap").forEach(i=>{i.value=i.dataset.ans;i.classList.add("ok");i.classList.remove("no");const f=i.parentNode.querySelector(".ansfix");if(f)f.remove();});document.getElementById("score").innerHTML="Lösung angezeigt";}
 
-let order=CARDS.map((_,i)=>i),fi=0;
-function showCard(){const c=CARDS[order[fi]];document.getElementById("flash").classList.remove("flip");
+let known=(function(){try{return new Set(JSON.parse(localStorage.getItem("ks-known")||"[]"));}catch(e){return new Set();}})();
+function saveKnown(){try{localStorage.setItem("ks-known",JSON.stringify([...known]));}catch(e){}}
+let round=[],ci=0;
+function buildRound(){round=shuffle(CARDS.map((c,i)=>i).filter(i=>!known.has(CARDS[i].n)));ci=0;}
+function fcStat(){var total=CARDS.length,learned=known.size;
+  document.getElementById("fcFill").style.width=(total?Math.round(learned/total*100):0)+"%";
+  document.getElementById("fcStat").textContent="Gelernt "+learned+" / "+total+"  \u00b7  diese Runde noch "+Math.max(0,round.length-ci);}
+function showCard(){
+  if(known.size>=CARDS.length){var f=document.getElementById("flash");f.classList.remove("flip");
+    document.getElementById("fcQ").innerHTML="Alle durch!";
+    document.getElementById("fcA").innerHTML='<div class="full">Geschafft</div><div class="fn">Du hast alle '+CARDS.length+' Protokolle als \u201ekann ich\u201c markiert. Auf \u201eFortschritt zur\u00fccksetzen\u201c tippen, um von vorne zu starten.</div>';
+    document.getElementById("fcKnow").disabled=true;document.getElementById("fcAgain").disabled=true;fcStat();return;}
+  if(ci>=round.length)buildRound();
+  document.getElementById("fcKnow").disabled=false;document.getElementById("fcAgain").disabled=false;
+  var c=CARDS[round[ci]];document.getElementById("flash").classList.remove("flip");
   document.getElementById("fcQ").innerHTML=esc(c.n);
-  document.getElementById("fcA").innerHTML=`<div>${B(c.t,"b-"+c.lay)}</div><div class="fn">${esc(c.fn)}</div>`;
-  document.getElementById("fcPos").textContent=(fi+1)+" / "+CARDS.length;}
+  document.getElementById("fcA").innerHTML='<div class="full">'+esc(c.full)+'</div>'+B(c.t,"b-"+c.lay)+'<div class="fn">'+esc(c.fn)+'</div>';
+  fcStat();}
+function fcNext(){ci++;if(ci>=round.length)buildRound();showCard();}
 
 buildMerk();
 const dSel=document.getElementById("deckSel");
@@ -489,9 +510,9 @@ document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
   document.getElementById("p-"+t.dataset.p).classList.add("active");
 });
 document.getElementById("flash").onclick=function(){this.classList.toggle("flip");};
-document.getElementById("fcNext").onclick=()=>{fi=(fi+1)%CARDS.length;showCard();};
-document.getElementById("fcPrev").onclick=()=>{fi=(fi-1+CARDS.length)%CARDS.length;showCard();};
-document.getElementById("fcShuf").onclick=()=>{order=shuffle(order);fi=0;showCard();};
-showCard();
+document.getElementById("fcKnow").onclick=function(){if(known.size>=CARDS.length||ci>=round.length)return;known.add(CARDS[round[ci]].n);saveKnown();fcNext();};
+document.getElementById("fcAgain").onclick=function(){if(known.size>=CARDS.length)return;fcNext();};
+document.getElementById("fcReset").onclick=function(){known.clear();saveKnown();buildRound();showCard();};
+buildRound();showCard();
 </script>
 <script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js").catch(function(){});});}</script></body></html>
