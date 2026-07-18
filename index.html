@@ -1,0 +1,476 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#2f66df"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="KS Lernen"><link rel="apple-touch-icon" href="./icon.svg"><link rel="icon" href="./icon.svg"><link rel="manifest" href="./manifest.webmanifest"></head><title>KS Lernplattform – Header, Schemata & Protokolle</title>
+<style>
+  :root{
+    --bg:#eef1f6; --surface:#ffffff; --surface2:#f6f8fb; --ink:#182231; --muted:#5b6675;
+    --line:#dde3ec; --accent:#2f66df; --accent2:#1f4fb8; --accent-soft:#e7effd;
+    --good:#1f9d55; --good-soft:#e6f6ec; --bad:#d13438; --bad-soft:#fdeaea;
+    --l2:#2f8f7a; --l3:#2f66df; --l4:#8a4fd0; --l5:#c25a17; --lx:#5b6675;
+    --shadow:0 1px 2px rgba(20,30,50,.06),0 8px 26px rgba(20,30,50,.07);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#0e131a; --surface:#161d27; --surface2:#111823; --ink:#e6edf6; --muted:#93a0b2;
+      --line:#26313f; --accent:#6ea0ff; --accent2:#8fb6ff; --accent-soft:#152238;
+      --good:#41c07a; --good-soft:#122a1c; --bad:#ff7b7f; --bad-soft:#2a1414;
+      --l2:#4bc0a6; --l3:#6ea0ff; --l4:#b78bea; --l5:#ee9a5c; --lx:#93a0b2;
+      --shadow:0 1px 2px rgba(0,0,0,.35),0 10px 30px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="light"]{--bg:#eef1f6;--surface:#fff;--surface2:#f6f8fb;--ink:#182231;--muted:#5b6675;--line:#dde3ec;--accent:#2f66df;--accent-soft:#e7effd;--good:#1f9d55;--good-soft:#e6f6ec;--bad:#d13438;--bad-soft:#fdeaea;--l2:#2f8f7a;--l3:#2f66df;--l4:#8a4fd0;--l5:#c25a17;--lx:#5b6675;}
+  :root[data-theme="dark"]{--bg:#0e131a;--surface:#161d27;--surface2:#111823;--ink:#e6edf6;--muted:#93a0b2;--line:#26313f;--accent:#6ea0ff;--accent-soft:#152238;--good:#41c07a;--good-soft:#122a1c;--bad:#ff7b7f;--bad-soft:#2a1414;--l2:#4bc0a6;--l3:#6ea0ff;--l4:#b78bea;--l5:#ee9a5c;--lx:#93a0b2;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.55;font-size:15.5px}
+  .wrap{max-width:1000px;margin:0 auto;padding:26px 18px 90px}
+  header.top h1{font-size:23px;margin:0 0 3px;letter-spacing:-.01em}
+  header.top p{margin:0;color:var(--muted);font-size:13.5px}
+  .tabs{display:flex;gap:6px;margin:20px 0 6px;flex-wrap:wrap;position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:5}
+  .tab{border:1px solid var(--line);background:var(--surface);color:var(--muted);padding:9px 16px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600}
+  .tab:hover{color:var(--ink)}
+  .tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+  .panel{display:none} .panel.active{display:block}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;margin:16px 0 0;box-shadow:var(--shadow)}
+  h2{font-size:18px;margin:0 0 4px;letter-spacing:-.01em}
+  h3{font-size:15px;margin:20px 0 8px}
+  .sub{color:var(--muted);font-size:12.5px;margin:0 0 12px}
+  .badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.03em;padding:2px 8px;border-radius:999px;color:#fff;vertical-align:middle;margin-left:6px}
+  .b-l2{background:var(--l2)} .b-l3{background:var(--l3)} .b-l4{background:var(--l4)} .b-l5{background:var(--l5)} .b-lx{background:var(--lx)}
+  .scroll{overflow-x:auto}
+  table.bits{border-collapse:collapse;width:100%;min-width:560px;table-layout:fixed;margin-top:4px}
+  table.bits col.offcol{width:40px}
+  table.bits td{border:1px solid var(--line);padding:6px 3px;text-align:center;font-size:12.5px;background:var(--surface2)}
+  table.bits td.fld .lbl{font-weight:600;display:block;line-height:1.2}
+  table.bits td.fld .bt{color:var(--muted);font-size:10px;font-variant-numeric:tabular-nums}
+  table.bits td.off{background:var(--surface);color:var(--muted);font:700 11px ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+  table.bits tr.ruler td{background:transparent;border:0;border-bottom:1px solid var(--line);text-align:left;color:var(--muted);font:600 11px ui-monospace,Menlo,monospace;padding:0 2px 3px}
+  table.bits tr.ruler td.off{font-size:9px;text-transform:uppercase;letter-spacing:.04em;text-align:center}
+  table.bits tr.ruler td .r{float:right}
+  .strip{display:flex;gap:0;border-radius:8px;overflow:hidden;border:1px solid var(--line);margin-top:6px;min-width:560px}
+  .scrollx{overflow-x:auto}
+  .strip .cell{padding:8px 4px;text-align:center;border-right:1px solid var(--line);background:var(--surface2);min-width:46px}
+  .strip .cell:last-child{border-right:0}
+  .strip .cell .cn{font-weight:600;font-size:12px;display:block;line-height:1.25}
+  .strip .cell .cs{color:var(--muted);font-size:10.5px}
+  input.gap{width:100%;min-width:46px;max-width:170px;border:1px solid var(--accent);border-radius:6px;padding:4px 5px;font-size:12px;background:var(--surface);color:var(--ink);text-align:center;font-family:inherit}
+  input.gap.goff{max-width:42px}
+  input.gap:focus{outline:2px solid var(--accent);outline-offset:1px}
+  input.gap.ok{border-color:var(--good);background:var(--good-soft)}
+  input.gap.no{border-color:var(--bad);background:var(--bad-soft)}
+  .ansfix{display:block;color:var(--good);font-size:10.5px;margin-top:2px;font-weight:600}
+  table.gt{border-collapse:collapse;width:100%;font-size:13.5px;margin-top:4px}
+  table.gt th,table.gt td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+  table.gt thead th{background:var(--accent-soft);font-weight:650}
+  table.gt td.num{text-align:center;font-variant-numeric:tabular-nums;font-weight:700;width:48px}
+  ul.tax{list-style:none;margin:6px 0 0;padding:0}
+  ul.tax>li{margin:8px 0;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface2)}
+  ul.tax>li>.cl{font-weight:700}
+  ul.tax .desc{color:var(--muted);font-size:12.5px;margin:2px 0 6px}
+  ul.tax .kids{display:flex;flex-wrap:wrap;gap:6px}
+  ul.tax .kid{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 10px;font-size:12.5px;font-weight:600}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:14px 0 2px}
+  select,button.btn{font-family:inherit;font-size:14px;border-radius:9px;border:1px solid var(--line);padding:8px 12px;background:var(--surface);color:var(--ink);cursor:pointer;font-weight:600}
+  button.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  button.btn:hover{border-color:var(--accent)}
+  .score{margin-left:auto;font-weight:700;font-size:14px}
+  .score .g{color:var(--good)}
+  .hint{color:var(--muted);font-size:12.5px;margin-top:10px}
+  .fcwrap{max-width:560px;margin:6px auto 0}
+  .flash{perspective:1200px;height:270px;cursor:pointer}
+  .flash .inner{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+  .flash.flip .inner{transform:rotateY(180deg)}
+  .flash .face{position:absolute;inset:0;backface-visibility:hidden;border:1px solid var(--line);border-radius:16px;padding:24px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;background:var(--surface);box-shadow:var(--shadow)}
+  .flash .back{transform:rotateY(180deg);background:var(--surface2)}
+  .flash .q{font-size:20px;font-weight:700}
+  .flash .a{font-size:15px}
+  .flash .a .fn{color:var(--muted);margin-top:8px;font-size:14px}
+  .flash .tip{position:absolute;bottom:10px;left:0;right:0;color:var(--muted);font-size:11px}
+  .fcbar{display:flex;gap:8px;align-items:center;margin-top:12px;justify-content:center}
+  .fcbar .pos{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums;min-width:64px;text-align:center}
+  @media (prefers-reduced-motion:reduce){.flash .inner{transition:none}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>KS Lernplattform</h1>
+    <p>Header, Schemata und Protokolle aus den Vorlesungsfolien (WS25/26). Format nach Klausur 2025/26. Feldnamen im Original (nicht übersetzt).</p>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-p="merk">Merkblatt</button>
+    <button class="tab" role="tab" aria-selected="false" data-p="train">Lücken-Training</button>
+    <button class="tab" role="tab" aria-selected="false" data-p="cards">Karteikarten</button>
+  </div>
+
+  <section class="panel active" id="p-merk"></section>
+
+  <section class="panel" id="p-train">
+    <div class="card">
+      <h2>Lücken-Training</h2>
+      <p class="sub">Deck wählen. Zufällige Felder (auch Byte-Marker an der y-Achse) sind leer, ausfüllen und prüfen. Bit-Skala oben 0–31 (32 Bit), Byte-Offset links nach unten.</p>
+      <div class="controls">
+        <select id="deckSel"></select>
+        <button class="btn" id="btnNew">Neue Lücken</button>
+        <button class="btn" id="btnNext">Nächstes Schema</button>
+        <button class="btn primary" id="btnCheck">Prüfen</button>
+        <button class="btn" id="btnSol">Lösung</button>
+        <span class="score" id="score"></span>
+      </div>
+    </div>
+    <div class="card" id="trainArea"></div>
+  </section>
+
+  <section class="panel" id="p-cards">
+    <div class="card">
+      <h2>Karteikarten – alle Protokolle</h2>
+      <p class="sub">Vorderseite: Protokoll. Rückseite: Schicht + Funktion. Klick zum Umdrehen.</p>
+      <div class="fcwrap">
+        <div class="flash" id="flash">
+          <div class="inner">
+            <div class="face front"><div class="q" id="fcQ"></div><div class="tip">Klicken zum Umdrehen</div></div>
+            <div class="face back"><div class="a" id="fcA"></div><div class="tip">Klicken zum Umdrehen</div></div>
+          </div>
+        </div>
+        <div class="fcbar">
+          <button class="btn" id="fcPrev">‹ Zurück</button>
+          <span class="pos" id="fcPos"></span>
+          <button class="btn" id="fcNext">Weiter ›</button>
+          <button class="btn" id="fcShuf">Mischen</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+"use strict";
+const B=(t,c)=>`<span class="badge ${c}">${t}</span>`;
+// bits: rows=[[label,displayBits,trueBits?],...]  displayBits Summe je Zeile = 32; trueBits nur bei kollabierten Feldern (128/512/...) fuer Byte-Offset
+const SCHEMAS={
+  ipv4:{name:"IPv4 Header",lay:"l3",layTxt:"Schicht 3 · Internet",src:"fol 09",kind:"bits",rows:[
+    [["VERS",4],["H.LEN",4],["SERVICE TYPE",8],["TOTAL LENGTH",16]],
+    [["IDENTIFICATION",16],["FLAGS",3],["FRAGMENT OFFSET",13]],
+    [["TIME TO LIVE",8],["TYPE",8],["HEADER CHECKSUM",16]],
+    [["SOURCE IP ADDRESS",32]],
+    [["DESTINATION IP ADDRESS",32]],
+    [["IP OPTIONS (may be omitted)",24],["PADDING",8]]]},
+  ipv6:{name:"IPv6 Base Header",lay:"l3",layTxt:"Schicht 3 · Internet",src:"fol 09",kind:"bits",rows:[
+    [["VERS",4],["TRAFFIC CLASS",8],["FLOW LABEL",20]],
+    [["PAYLOAD LENGTH",16],["NEXT HEADER",8],["HOP LIMIT",8]],
+    [["SOURCE ADDRESS",32,128]],
+    [["DESTINATION ADDRESS",32,128]]]},
+  tcp:{name:"TCP Segment",lay:"l4",layTxt:"Schicht 4 · Transport",src:"fol 12",kind:"bits",rows:[
+    [["SOURCE PORT",16],["DESTINATION PORT",16]],
+    [["SEQUENCE NUMBER",32]],
+    [["ACKNOWLEDGEMENT NUMBER",32]],
+    [["HLEN",4],["NOT USED",6],["CODE BITS",6],["WINDOW",16]],
+    [["CHECKSUM",16],["URGENT POINTER",16]],
+    [["OPTIONS (if any)",24],["PADDING",8]]]},
+  udp:{name:"UDP Datagramm",lay:"l4",layTxt:"Schicht 4 · Transport",src:"fol 11",kind:"bits",rows:[
+    [["UDP SOURCE PORT",16],["UDP DESTINATION PORT",16]],
+    [["UDP MESSAGE LENGTH",16],["UDP CHECKSUM",16]]]},
+  udpps:{name:"UDP Pseudoheader",lay:"l4",layTxt:"Schicht 4 · Transport",src:"fol 11",kind:"bits",rows:[
+    [["IP SOURCE ADDRESS",32]],
+    [["IP DESTINATION ADDRESS",32]],
+    [["ZERO",8],["PROTO",8],["UDP LENGTH",16]]]},
+  arp:{name:"ARP Message (Ethernet/IPv4)",lay:"l2",layTxt:"Schicht 2 · Network Interface",src:"fol 10",kind:"bits",rows:[
+    [["HARDWARE ADDRESS TYPE",16],["PROTOCOL ADDRESS TYPE",16]],
+    [["HADDR LEN",8],["PADDR LEN",8],["OPERATION",16]],
+    [["SENDER HADDR (first 4 octets)",32]],
+    [["SENDER HADDR (last 2 octets)",16],["SENDER PADDR (first 2 octets)",16]],
+    [["SENDER PADDR (last 2 octets)",16],["TARGET HADDR (first 2 octets)",16]],
+    [["TARGET HADDR (last 4 octets)",32]],
+    [["TARGET PADDR (all 4 octets)",32]]]},
+  dhcp:{name:"IPv4 DHCP Message",lay:"l5",layTxt:"Konfiguration · über UDP",src:"fol 10",kind:"bits",rows:[
+    [["OP",8],["HTYPE",8],["HLEN",8],["HOPS",8]],
+    [["TRANSACTION IDENTIFIER",32]],
+    [["SECONDS ELAPSED",16],["FLAGS",16]],
+    [["CLIENT IP ADDRESS",32]],
+    [["YOUR IP ADDRESS",32]],
+    [["SERVER IP ADDRESS",32]],
+    [["ROUTER IP ADDRESS",32]],
+    [["CLIENT HARDWARE ADDRESS (16 octets)",32,128]],
+    [["SERVER HOST NAME (64 octets)",32,512]],
+    [["BOOT FILE NAME (128 octets)",32,1024]],
+    [["OPTIONS (variable)",32]]]},
+  rip:{name:"RIP v2 Update Message",lay:"lx",layTxt:"Routing (IGP) · über UDP",src:"fol 12",kind:"bits",rows:[
+    [["COMMAND (1-5)",8],["VERSION (2)",8],["MUST BE ZERO",16]],
+    [["FAMILY OF NET 1",16],["ROUTE TAG FOR NET 1",16]],
+    [["IP ADDRESS OF NET 1",32]],
+    [["ADDRESS MASK FOR NET 1",32]],
+    [["NEXT HOP FOR NET 1",32]],
+    [["DISTANCE TO NET 1",32]]]},
+  eth2:{name:"Ethernet II Frame",lay:"l2",layTxt:"Schicht 2 · Network Interface",src:"fol 05",kind:"bytes",cells:[
+    ["destination address","6 bytes",6],["source address","6 bytes",6],["type","2 bytes",2],["payload","46-1500 bytes",8],["CRC","4 bytes",4]]},
+  e8023:{name:"IEEE 802.3 Frame",lay:"l2",layTxt:"Schicht 2 · Network Interface",src:"fol 05",kind:"bytes",cells:[
+    ["destination address","6 bytes",6],["source address","6 bytes",6],["length","2 bytes",2],["LLC/SNAP","8 bytes",4],["payload","46-1500 bytes",8],["CRC","4 bytes",4]]},
+  wifi:{name:"IEEE 802.11 (WiFi) Frame",lay:"l2",layTxt:"Schicht 2 · Network Interface",src:"fol 05",kind:"bytes",cells:[
+    ["CTL","2 bytes",2],["DUR","2 bytes",2],["Address 1 (destination)","6 bytes",5],["Address 2 (source)","6 bytes",5],["Address 3 (dest. 2)","6 bytes",5],["SEQ","2 bytes",2],["Address 4","6 bytes",5],["Payload","0 to 2312 bytes",8],["CRC","4 bytes",4]]},
+  icmp:{name:"Most important ICMPv4 messages",lay:"l3",layTxt:"Schicht 3 · Internet",src:"fol 10",kind:"table",
+    head:["Num.","Type","Purpose"],blank:[1,2],rows:[
+    ["0","Echo Reply","Used by ping and traceroute"],
+    ["3","Destination Unreachable","Datagram could not be delivered"],
+    ["5","Redirect","Host must change a route"],
+    ["8","Echo Request","Used by ping and traceroute"],
+    ["11","Time Exceeded","TTL expired or fragments timed out"],
+    ["12","Parameter Problem","IP header is incorrect"],
+    ["30","Traceroute","Used by the traceroute program"]]},
+  schichten:{name:"TCP/IP 5-Schichten-Modell",lay:"lx",layTxt:"fol 02 / fol 08",src:"fol 02/08",kind:"table",
+    head:["Nr.","Layer","Aufgabe","Beispiel"],blank:[1,3],rows:[
+    ["5","Application","Struktur der zu übertragenden Daten","FTP, IMAP, Bittorrent"],
+    ["4","Transport","Kommunikation zwischen Anwendungen","TCP, UDP"],
+    ["3","Internet","Kommunikation zwischen beliebigen Geräten","IP"],
+    ["2","Network Interface","Kommunikation auf dem Medium, Hardwareadressierung","Ethernet"],
+    ["1","Physical","Daten als Signal auf dem Medium","Signal / Medium"]]},
+  lantax:{name:"LAN Medienzugriff – Taxonomie",lay:"l2",layTxt:"Schicht 2 · fol 04",src:"fol 04",kind:"tax",classes:[
+    {cl:"Controlled Access",desc:"Global gesteuerter Zugriff (z. B. Token)",kids:["Polling","Reservation","Token Passing"]},
+    {cl:"Random Access",desc:"Jeder kann jederzeit senden, auf Kanal lauschen",kids:["ALOHA","CSMA/CD","CSMA/CA"]},
+    {cl:"Channelization",desc:"Aufteilung des Kanals nach Zeit/Frequenz/Code",kids:["FDMA","TDMA","CDMA"]}]},
+  ipclass:{name:"IPv4 Adressklassen (Classful)",lay:"l3",layTxt:"Schicht 3 · fol 08",src:"fol 08",kind:"table",
+    head:["Class","Erste Bits","Aufteilung"],blank:[1,2],rows:[
+    ["A","0","prefix (7 bit) + suffix (24 bit)"],
+    ["B","10","prefix (14 bit) + suffix (16 bit)"],
+    ["C","110","prefix (21 bit) + suffix (8 bit)"],
+    ["D","1110","multicast address"],
+    ["E","1111","reserved (not assigned)"]]},
+  specialip:{name:"Reservierte / spezielle IPv4-Adressen",lay:"l3",layTxt:"Schicht 3 · fol 08",src:"fol 08",kind:"table",
+    head:["Prefix","Suffix","Type Of Address","Purpose"],blank:[2,3],rows:[
+    ["all-0s","all-0s","this computer","used during bootstrap"],
+    ["network","all-0s","network","identifies a network"],
+    ["network","all-1s","directed broadcast","broadcast on specified net"],
+    ["all-1s","all-1s","limited broadcast","broadcast on local net"],
+    ["127/8","any","loopback","testing"]]},
+  cidr:{name:"CIDR / Hosts pro Präfix",lay:"l3",layTxt:"Schicht 3 · fol 08",src:"fol 08",kind:"table",
+    head:["Präfix","Hostbits","Nutzbare Hosts (2^n − 2)"],blank:[1,2],rows:[
+    ["/28","4","14"],["/24","8","254"],["/22","10","1022"],["/16","16","65534"]]},
+  bytestuff:{name:"Byte Stuffing – Ersetzungstabelle",lay:"l2",layTxt:"Schicht 2 · fol 04",src:"fol 04",kind:"table",
+    head:["Byte In Payload","Sequence Sent"],blank:[0,1],rows:[
+    ["SOH","ESC A"],["EOT","ESC B"],["ESC","ESC C"]]},
+  handshake:{name:"TCP Three-Way Handshake",lay:"l4",layTxt:"Schicht 4 · fol 11",src:"fol 11",kind:"table",
+    head:["#","Segment","Richtung / Inhalt"],blank:[1,2],rows:[
+    ["1","SYN","A→B: initiale Sequenznummer + Buffer-Größe"],
+    ["2","SYN + ACK","B→A: Sequenznummer + Bestätigung"],
+    ["3","ACK","A→B: Bestätigung → Verbindung offen"],
+    ["Abbau","FIN","Verbindungsabbau; ACK in jede Richtung sichert alle Daten"]]},
+  congestion:{name:"TCP Überlastkontrolle – 3 Phasen (Tahoe)",lay:"l4",layTxt:"Schicht 4 · fol 12",src:"fol 12",kind:"table",
+    head:["Phase","Verhalten"],blank:[1],rows:[
+    ["Slow Start","Exponentielle Steigerung des cWnd bis zum Slow-Start-Threshold"],
+    ["Congestion Avoidance","Lineare Steigerung, solange keine Überlast"],
+    ["Verlust / Überlast","cWnd wird reduziert; Überlast wird am Delay gemessen"]]},
+  cubic:{name:"TCP CUBIC – Formel & Modi",lay:"l4",layTxt:"Schicht 4 · fol 13",src:"fol 13",kind:"table",
+    head:["Symbol / Modus","Bedeutung"],blank:[1],rows:[
+    ["W(t) = C·(t−K)³ + Wmax","Kubische Wachstumsfunktion (Name CUBIC = kubische Funktion)"],
+    ["C","Konstante (Skalierung)"],
+    ["K","Zeit bis W = Wmax; K = cubic_root(Wmax·β / C)"],
+    ["Wmax","cWnd vor dem letzten Paketverlust"],
+    ["β (beta)","Reduktionsfaktor des cWnd bei Verlust"],
+    ["TCP-Modus","cWnd < Wtcp(t): wächst wie Standard-TCP (AIMD)"],
+    ["Konkaver Bereich","cWnd < Wmax"],
+    ["Konvexer Bereich","cWnd > Wmax"]]},
+  bbr:{name:"TCP BBR – 4 Phasen & Kenngrößen",lay:"l4",layTxt:"Schicht 4 · fol 13",src:"fol 13",kind:"table",
+    head:["Phase / Begriff","Ziel / Bedeutung"],blank:[1],rows:[
+    ["Startup","Schnell die Bottleneck Bandwidth finden; Senderate exponentiell (wie Slow Start)"],
+    ["Drain","In Startup aufgebaute Warteschlangen abbauen (Senderate unter BtlBw)"],
+    ["ProbeBW","Zyklus aus 8 Runden: prüfen ob mehr Bandbreite da (ProbeCruise/Up/Down)"],
+    ["ProbeRTT","Minimale RTT neu messen; Senderate auf 4 Pakete reduzieren"],
+    ["BtlBw","Bottleneck Bandwidth: Bandbreite am Flaschenhals"],
+    ["RTprop","Round-Trip Propagation Time: RTT ohne Störungen"],
+    ["BDP = BtlBw · RTprop","Max. Daten ohne Überlast; optimaler Arbeitspunkt (Kleinrock)"]]},
+  dvtable:{name:"Distance Vector – Distanz-Tabelle (Knoten E)",lay:"lx",layTxt:"Routing · fol 07",src:"fol 07",kind:"table",
+    head:["Ziel \\ über","A","B","D"],blank:[1,2,3],rows:[
+    ["A","1","14","5"],["B","7","8","5"],["C","6","9","4"],["D","4","11","2"]]},
+  dijkstra:{name:"Dijkstra – Routing-Tabelle (Quelle 7)",lay:"lx",layTxt:"Routing · fol 06/07",src:"fol 06/07",kind:"table",
+    head:["Ziel","D (Kosten)","R (Next Hop)","Pfad"],blank:[1,2,3],rows:[
+    ["4","3","4","7-4"],["6","5","6","7-6"],["3","7","6","7-6-3"],["2","10","6","7-6-3-2"],["5","16","6","7-6-3-2-5"],["1","25","6","7-6-3-2-5-1"]]},
+  bridge:{name:"Lernende Bridge – Adresslisten",lay:"l2",layTxt:"Schicht 2 · fol 06",src:"fol 06",kind:"table",
+    head:["Ereignis","Liste Segment 1","Liste Segment 2"],blank:[1,2],rows:[
+    ["Anschaltung","(leer)","(leer)"],
+    ["U sendet an V","U","(leer)"],
+    ["V sendet an U","U, V","(leer)"],
+    ["Z Broadcast","U, V","Z"],
+    ["Y sendet an V","U, V","Z, Y"],
+    ["Y sendet an X","U, V","Z, Y"],
+    ["X sendet an W","U, V","Z, Y, X"],
+    ["W sendet an Z","U, V, W","Z, Y, X"]]},
+  osi:{name:"OSI 7-Schichten-Modell (Vergleich)",lay:"lx",layTxt:"Vergleich · fol 02 (Buch)",src:"fol 02",kind:"table",
+    head:["Nr.","Layer (OSI)"],blank:[1],rows:[
+    ["7","Application"],["6","Presentation"],["5","Session"],["4","Transport"],["3","Network"],["2","Data Link"],["1","Physical"]]}
+};
+const DECKS=[
+  {id:"all",title:"Alle Schemata",items:Object.keys(SCHEMAS)},
+  {id:"l2",title:"Folie: Schicht 2 – Frames & ARP",items:["eth2","e8023","wifi","arp","lantax"]},
+  {id:"l3",title:"Folie: Schicht 3 – IP & ICMP",items:["ipv4","ipv6","icmp"]},
+  {id:"l4",title:"Folie: Schicht 4 – Transport",items:["udp","udpps","tcp"]},
+  {id:"route",title:"Folie: Routing & Konfiguration",items:["rip","dhcp"]},
+  {id:"konzept",title:"Folie: Modell & Konzepte",items:["schichten","lantax","osi"]},
+  {id:"addr",title:"Folie: Adressierung (IPv4/CIDR)",items:["ipclass","specialip","cidr"]},
+  {id:"tcp",title:"Folie: TCP Überlast, CUBIC, BBR, Handshake",items:["congestion","handshake","cubic","bbr"]},
+  {id:"routalg",title:"Folie: Routing-Verfahren (DV/Dijkstra/Bridge)",items:["dvtable","dijkstra","bridge"]},
+  {id:"stuff",title:"Folie: Byte Stuffing",items:["bytestuff"]}
+];
+const CARDS=[
+  {n:"Ethernet II",lay:"l2",t:"Schicht 2 (Network Interface)",fn:"LAN frame format: 6-byte destination + 6-byte source address, 2-byte type, payload, 4-byte CRC. fol 05"},
+  {n:"IEEE 802.3",lay:"l2",t:"Schicht 2 (Network Interface)",fn:"IEEE Ethernet standard: type field = length, + 8-byte LLC/SNAP. Genutzt u. a. von 802.11. fol 05"},
+  {n:"IEEE 802.11 / WLAN",lay:"l2",t:"Schicht 2 (Network Interface)",fn:"WiFi, Medienzugriff per CSMA/CA, bis zu 4 MAC-Adressen im Frame. fol 05"},
+  {n:"ARP",lay:"l2",t:"Schicht 2 (Network Interface)",fn:"Address Resolution Protocol: löst IP-Adresse → MAC-Adresse auf. fol 10 (\"ARP ist Layer 2\")"},
+  {n:"IP / IPv4",lay:"l3",t:"Schicht 3 (Internet)",fn:"Verbindungslos, best-effort, virtuelle/universelle Pakete, Weiterleitung über Router anhand Zieladresse, zwischen Netzen. fol 08/09"},
+  {n:"IPv6",lay:"l3",t:"Schicht 3 (Internet)",fn:"Nachfolger von IPv4, 128-bit Adressen, 40-byte base header + extension header. fol 09"},
+  {n:"ICMP",lay:"l3",t:"Schicht 3 (Internet)",fn:"Control/error messages für best-effort IP, in IP-Payload gekapselt (ICMPv4/ICMPv6). fol 10"},
+  {n:"DHCP",lay:"l5",t:"Konfiguration / Anwendung, nutzt UDP",fn:"Dynamische Vergabe von IP-Konfiguration (request/response). fol 10"},
+  {n:"RIP",lay:"lx",t:"Routing-Protokoll (IGP), nutzt UDP",fn:"Distance Vector, hop-count metric, Routing innerhalb eines AS. fol 12"},
+  {n:"OSPF",lay:"lx",t:"Routing-Protokoll (IGP)",fn:"Link State, Metriken, OSPFv3 für IPv6, Multi-Access-Unterstützung. fol 12"},
+  {n:"BGP",lay:"lx",t:"Routing-Protokoll (EGP), nutzt TCP",fn:"Zwischen Autonomen Systemen, transit/stub, von Tier-1-ISPs genutzt. fol 12"},
+  {n:"TCP",lay:"l4",t:"Schicht 4 (Transport)",fn:"Verbindungsorientiert, zuverlässig, byte stream, full duplex, flow & congestion control, 3-way handshake. fol 11/12"},
+  {n:"UDP",lay:"l4",t:"Schicht 4 (Transport)",fn:"Verbindungslos, best-effort, message-oriented, minimal (8-byte header), keine flow/congestion control. fol 11"},
+  {n:"HTTP",lay:"l5",t:"Schicht 5 (Application)",fn:"Web protocol, nutzt TCP. fol 03"},
+  {n:"DNS",lay:"l5",t:"Schicht 5 (Application)",fn:"Namensauflösung Domain → IP. fol 03"},
+  {n:"FTP / IMAP",lay:"l5",t:"Schicht 5 (Application)",fn:"File transfer / mail access, jede Anwendung implementiert eigenes Protokoll. fol 02/03"},
+  {n:"NAT / NAPT",lay:"l3",t:"Schicht 3 (NAPT auch 4)",fn:"Network Address Translation am Übergang Internet↔Standort: übersetzt private (nonroutable) Adressen ausgehender Datagramme in eine globale. fol 10"},
+  {n:"STP – Spanning Tree Protocol",lay:"l2",t:"Schicht 2 (Network Interface)",fn:"Distributed Spanning Tree zwischen Bridges: verhindert Schleifen (endlose Broadcasts); Bridges kommunizieren über Multicast 01:80:C2:00:00:00. fol 06"},
+  {n:"SMTP",lay:"l5",t:"Schicht 5 (Application)",fn:"Simple Mail Transfer Protocol: Transfer von E-Mails zur Mailbox des Empfängers. fol 03"},
+  {n:"POP3 / IMAP",lay:"l5",t:"Schicht 5 (Application)",fn:"Remote-Zugriff auf die Mailbox des Nutzers (Abholen/Verwalten von E-Mail). fol 03"},
+  {n:"IPv6 Neighbour Discovery",lay:"l3",t:"Schicht 3 (Internet), nutzt ICMPv6",fn:"IPv6-ND: Ersatz für ARP in IPv6, Auflösung und Erreichbarkeit von Nachbarn. fol 10"},
+  {n:"ICMPv6",lay:"l3",t:"Schicht 3 (Internet)",fn:"ICMP-Variante für IPv6 (Fehler-/Kontrollnachrichten, u. a. für Neighbour Discovery). fol 10"},
+  {n:"IPv6 Autoconfiguration (SLAAC) / DHCPv6",lay:"l3",t:"Schicht 3 / Konfiguration",fn:"Automatische Generierung einer eindeutigen IPv6-Adresse (stateless SLAAC), bzw. DHCPv6 (stateful). fol 10"},
+  {n:"Token Ring",lay:"l2",t:"Schicht 2 (Network Interface)",fn:"IBM Token Ring (~16 Mbps): Ring-Topologie mit Token Passing als Medienzugriff. fol 06"},
+  {n:"FDDI / CDDI",lay:"l2",t:"Schicht 2 (Network Interface)",fn:"Fiber Distributed Data Interface: Glasfaser-Ring mit gegenläufigen Ringen (Redundanz); CDDI = Variante über Kupfer. fol 06"},
+  {n:"WiMAX (IEEE 802.16)",lay:"l2",t:"Schicht 1/2 (MAN)",fn:"Metropolitan Area Network per Funk, Zellradius bis 10 km; Fixed/Mobile WiMAX. fol 05"},
+  {n:"Bluetooth (IEEE 802.15.1)",lay:"l2",t:"Schicht 1/2 (PAN)",fn:"Personal Area Network: Kommunikation von Peripheriegeräten mit dem Rechner. fol 05"},
+  {n:"ZigBee (IEEE 802.15.4)",lay:"l2",t:"Schicht 1/2 (PAN)",fn:"Personal Area Network für Heimautomation (stromsparend). fol 05"},
+  {n:"VSAT",lay:"lx",t:"Schicht 1 (Physical)",fn:"Very Small Aperture Terminal: Satellitenkommunikation über kleine Bodenstationen. fol 05"},
+  {n:"GPS",lay:"lx",t:"Schicht 1 (Physical)",fn:"Positions-/Zeitbestimmung per Satellit (kein Kommunikationsprotokoll im engeren Sinn). fol 05"},
+  {n:"Software Defined Radio (SDR)",lay:"lx",t:"Schicht 1 (Physical)",fn:"Funkübertragung, deren Signalverarbeitung per Software statt fester Hardware erfolgt. fol 05"},
+  {n:"RIPng",lay:"lx",t:"Routing (IGP), über UDP",fn:"RIP next generation: IPv6-Variante von RIP (Distance Vector). fol 12"},
+  {n:"IS-IS",lay:"lx",t:"Routing-Protokoll (IGP)",fn:"Link-State IGP, Alternative zu OSPF (mögliches IGP neben RIP/OSPF). fol 12"},
+  {n:"QUIC",lay:"l4",t:"Schicht 4 (Transport), für HTTP/3",fn:"Transportprotokoll, u. a. von Google/BBR für HTTP/3 genutzt (google.com-Suche, YouTube). fol 13"}
+];
+
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const norm=s=>String(s).toLowerCase().replace(/\s+/g," ").replace(/\./g,"").trim();
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+let RND=(new Date&&0)||987654321; function rnd(){RND=(RND*1103515245+12345)&0x7fffffff;return RND/0x7fffffff;}
+function rowBytes(r){return r.reduce((a,f)=>a+(f[2]||f[1]),0)/8;}
+function pickBlanks(n,frac){const idx=[...Array(n).keys()];for(let i=idx.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]];}const k=Math.max(2,Math.round(n*frac));return new Set(idx.slice(0,k));}
+
+function slotsOf(s){
+  if(s.kind==="bits"){const out=[];let off=0;s.rows.forEach(r=>{out.push(String(off));r.forEach(f=>out.push(f[0]));off+=rowBytes(r);});return out;}
+  if(s.kind==="bytes") return s.cells.map(c=>c[0]);
+  if(s.kind==="table"){const out=[];s.rows.forEach(r=>s.blank.forEach(ci=>out.push(r[ci])));return out;}
+  if(s.kind==="tax"){const out=[];s.classes.forEach(c=>{out.push(c.cl);c.kids.forEach(k=>out.push(k));});return out;}
+  return [];
+}
+function inp(ans,slot,extra,reveal){return `<input class="gap ${extra||""}" data-ans="${esc(ans)}" data-slot="${slot}">${reveal?`<span class="ansfix">${esc(ans)}</span>`:""}`;}
+function fldCell(label,bits,blank,slot,reveal){
+  if(blank) return `<td colspan="${bits}" class="fld">${inp(label,slot,"",reveal)}</td>`;
+  return `<td colspan="${bits}" class="fld"><span class="lbl">${esc(label)}</span><span class="bt">${bits}b</span></td>`;
+}
+function render(s,blanks,reveal){
+  let slot=-1; const isB=i=>blanks&&blanks.has(i);
+  if(s.kind==="bits"){
+    let h='<div class="scroll"><table class="bits"><colgroup><col class="offcol">'+'<col>'.repeat(32)+'</colgroup>';
+    h+='<tr class="ruler"><td class="off">Byte</td><td colspan="8">0</td><td colspan="8">8</td><td colspan="8">16</td><td colspan="8">24<span class="r">31</span></td></tr>';
+    let off=0;
+    s.rows.forEach(r=>{
+      h+="<tr>"; slot++; const ob=isB(slot);
+      h+=`<td class="off">${ob?inp(String(off),slot,"goff",reveal):off}</td>`;
+      r.forEach(f=>{slot++;h+=fldCell(f[0],f[1],isB(slot),slot,reveal);});
+      h+="</tr>"; off+=rowBytes(r);
+    });
+    return h+"</table></div>";
+  }
+  if(s.kind==="bytes"){
+    let h='<div class="scrollx"><div class="strip">';
+    s.cells.forEach(c=>{slot++;const bl=isB(slot);
+      const name=bl?inp(c[0],slot,"",reveal):`<span class="cn">${esc(c[0])}</span>`;
+      h+=`<div class="cell" style="flex:${c[2]}">${name}<span class="cs">${esc(c[1])}</span></div>`;});
+    return h+"</div></div>";
+  }
+  if(s.kind==="table"){
+    let h='<div class="scroll"><table class="gt"><thead><tr>'+s.head.map(x=>`<th>${esc(x)}</th>`).join("")+"</tr></thead><tbody>";
+    s.rows.forEach(r=>{h+="<tr>";r.forEach((cell,ci)=>{
+      const isNum=ci===0&&/^num/i.test(s.head[0]);
+      if(s.blank.includes(ci)){slot++;const bl=isB(slot);h+=`<td>${bl?inp(cell,slot,"",reveal):esc(cell)}</td>`;}
+      else h+=`<td class="${isNum?"num":""}">${esc(cell)}</td>`;
+    });h+="</tr>";});
+    return h+"</tbody></table></div>";
+  }
+  if(s.kind==="tax"){
+    let h='<ul class="tax">';
+    s.classes.forEach(c=>{slot++;const clB=isB(slot);
+      h+=`<li><span class="cl">${clB?inp(c.cl,slot,"",reveal):esc(c.cl)}</span><div class="desc">${esc(c.desc)}</div><div class="kids">`;
+      c.kids.forEach(k=>{slot++;const kB=isB(slot);h+=`<span class="kid">${kB?inp(k,slot,"",reveal):esc(k)}</span>`;});
+      h+="</div></li>";});
+    return h+"</ul>";
+  }
+  return "";
+}
+
+function buildMerk(){
+  const groups=[
+    ["Schicht 2 – Network Interface (Frames, ARP, Byte Stuffing, Bridge)",["eth2","e8023","wifi","arp","lantax","bytestuff","bridge"]],
+    ["Schicht 3 – Internet & Adressierung",["ipv4","ipv6","icmp","ipclass","specialip","cidr"]],
+    ["Schicht 4 – Transport & Überlastkontrolle",["udp","udpps","tcp","handshake","congestion","cubic","bbr"]],
+    ["Routing & Konfiguration",["rip","dhcp","dvtable","dijkstra"]],
+    ["Modell",["schichten","osi"]]
+  ];
+  let h="";
+  groups.forEach(([title,ids])=>{
+    h+=`<div class="card"><h2>${esc(title)}</h2>`;
+    ids.forEach(id=>{const s=SCHEMAS[id];
+      h+=`<h3>${esc(s.name)} ${B(s.layTxt,"b-"+s.lay)} <span class="sub" style="display:inline">· ${esc(s.src)}</span></h3>`;
+      h+=render(s,null,false);});
+    h+="</div>";
+  });
+  document.getElementById("p-merk").innerHTML=h;
+}
+
+let curId=null,curBlanks=null;
+function loadSchema(id){
+  curId=id; const s=SCHEMAS[id]; const n=slotsOf(s).length;
+  curBlanks=pickBlanks(n,0.45);
+  document.getElementById("trainArea").innerHTML=
+    `<h2>${esc(s.name)} ${B(s.layTxt,"b-"+s.lay)}</h2><p class="sub">Quelle: ${esc(s.src)} · ${curBlanks.size} Lücken</p>`
+    +render(s,curBlanks,false)
+    +`<p class="hint">Groß-/Kleinschreibung egal. Feldnamen wie auf den Folien (Original, z. B. TOTAL LENGTH, source address). Byte-Marker links = Byte-Offset der Zeile.</p>`;
+  document.getElementById("score").innerHTML="";
+}
+function currentDeck(){return DECKS.find(d=>d.id===document.getElementById("deckSel").value)||DECKS[0];}
+function nextSchema(){const it=currentDeck().items;let id=it[Math.floor(rnd()*it.length)];if(id===curId&&it.length>1)id=it[(it.indexOf(id)+1)%it.length];loadSchema(id);}
+function checkAll(){
+  const ins=document.querySelectorAll("#trainArea input.gap");let ok=0,tot=0;
+  ins.forEach(i=>{tot++;const good=norm(i.value)===norm(i.dataset.ans);
+    i.classList.toggle("ok",good);i.classList.toggle("no",!good);
+    let f=i.parentNode.querySelector(".ansfix");
+    if(!good){if(!f){f=document.createElement("span");f.className="ansfix";i.parentNode.appendChild(f);}f.textContent="→ "+i.dataset.ans;}
+    else if(f)f.remove();
+    if(good)ok++;});
+  document.getElementById("score").innerHTML=`<span class="g">${ok}</span> / ${tot} richtig`;
+}
+function showSol(){document.querySelectorAll("#trainArea input.gap").forEach(i=>{i.value=i.dataset.ans;i.classList.add("ok");i.classList.remove("no");const f=i.parentNode.querySelector(".ansfix");if(f)f.remove();});document.getElementById("score").innerHTML="Lösung angezeigt";}
+
+let order=CARDS.map((_,i)=>i),fi=0;
+function showCard(){const c=CARDS[order[fi]];document.getElementById("flash").classList.remove("flip");
+  document.getElementById("fcQ").innerHTML=esc(c.n);
+  document.getElementById("fcA").innerHTML=`<div>${B(c.t,"b-"+c.lay)}</div><div class="fn">${esc(c.fn)}</div>`;
+  document.getElementById("fcPos").textContent=(fi+1)+" / "+CARDS.length;}
+
+buildMerk();
+const dSel=document.getElementById("deckSel");
+DECKS.forEach(d=>{const o=document.createElement("option");o.value=d.id;o.textContent=d.title;dSel.appendChild(o);});
+dSel.value="all"; nextSchema();
+dSel.addEventListener("change",nextSchema);
+document.getElementById("btnNew").onclick=()=>loadSchema(curId);
+document.getElementById("btnNext").onclick=nextSchema;
+document.getElementById("btnCheck").onclick=checkAll;
+document.getElementById("btnSol").onclick=showSol;
+document.getElementById("trainArea").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();checkAll();}});
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected",x===t?"true":"false"));
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  document.getElementById("p-"+t.dataset.p).classList.add("active");
+});
+document.getElementById("flash").onclick=function(){this.classList.toggle("flip");};
+document.getElementById("fcNext").onclick=()=>{fi=(fi+1)%CARDS.length;showCard();};
+document.getElementById("fcPrev").onclick=()=>{fi=(fi-1+CARDS.length)%CARDS.length;showCard();};
+document.getElementById("fcShuf").onclick=()=>{order=shuffle(order);fi=0;showCard();};
+showCard();
+</script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js").catch(function(){});});}</script></body></html>

@@ -1,0 +1,12 @@
+{
+ "name":"KS Lernplattform",
+ "short_name":"KS Lernen",
+ "description":"Header, Schemata und Protokolle - Klausurvorbereitung Kommunikationssysteme",
+ "display":"standalone",
+ "orientation":"portrait",
+ "background_color":"#0e131a",
+ "theme_color":"#2f66df",
+ "start_url":"./",
+ "scope":"./",
+ "icons":[{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
