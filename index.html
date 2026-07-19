@@ -157,6 +157,7 @@
   <div class="tabs" role="tablist">
     <button class="tab" role="tab" aria-selected="true" data-p="merk">Merkblatt</button>
     <button class="tab" role="tab" aria-selected="false" data-p="train">Lücken-Training</button>
+    <button class="tab" role="tab" aria-selected="false" data-p="pruef">Prüfungsmodus</button>
     <button class="tab" role="tab" aria-selected="false" data-p="cards">Karteikarten</button>
     <button class="tab" role="tab" aria-selected="false" data-p="cubic">CUBIC &amp; BBR</button>
     <button class="tab" role="tab" aria-selected="false" data-p="exam">Probeklausuren</button>
@@ -178,6 +179,21 @@
       </div>
     </div>
     <div class="card" id="trainArea"></div>
+  </section>
+
+  <section class="panel" id="p-pruef">
+    <div class="card">
+      <h2>Prüfungsmodus – Schemas ohne Vorgaben</h2>
+      <p class="sub">Nur der Name ist gegeben, alle Felder sind leer. Trage das komplette Schema selbst ein (Feldnamen und Byte-Offsets), dann „Prüfen" oder „Lösung". Genau wie in der Klausur (z. B. IPv6-/TCP-Header komplett ausfüllen). Das Raster (Zeilen und Feldbreiten) bleibt als Koordinatensystem stehen.</p>
+      <div class="controls">
+        <select id="pruefSel"></select>
+        <button class="btn" id="pruefNext">Zufälliges Schema</button>
+        <button class="btn primary" id="pruefCheck">Prüfen</button>
+        <button class="btn" id="pruefSol">Lösung</button>
+        <span class="score" id="pruefScore"></span>
+      </div>
+    </div>
+    <div class="card" id="pruefArea"></div>
   </section>
 
   <section class="panel" id="p-cards">
@@ -642,6 +658,48 @@ document.getElementById("btnNext").onclick=nextSchema;
 document.getElementById("btnCheck").onclick=checkAll;
 document.getElementById("btnSol").onclick=showSol;
 document.getElementById("trainArea").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();checkAll();}});
+
+/* ---- Prüfungsmodus: Schemas komplett ausfüllen (keine Vorgaben) ---- */
+const PRUEF_GROUPS=[
+ ["Schicht 2 – Network Interface",["eth2","e8023","wifi","arp","lantax","bytestuff","bridge"]],
+ ["Schicht 3 – Internet & Adressierung",["ipv4","ipv6","icmp","ipclass","specialip","cidr"]],
+ ["Schicht 4 – Transport & Überlast",["udp","udpps","tcp","handshake","congestion","cubic","bbr"]],
+ ["Routing & Konfiguration",["rip","dhcp","dvtable","dijkstra"]],
+ ["Modell",["schichten","osi"]]
+];
+let curPruef=null;
+function loadPruef(id){
+  curPruef=id; const s=SCHEMAS[id]; if(!s) return; const n=slotsOf(s).length;
+  const all=new Set([...Array(n).keys()]);
+  document.getElementById("pruefArea").innerHTML=
+    `<h2>${esc(s.name)} ${B(s.layTxt,"b-"+s.lay)}</h2><p class="sub">Quelle: ${esc(s.src)} · alle ${n} Felder leer – keine Vorgaben</p>`
+    +render(s,all,false)
+    +`<p class="hint">Trage ALLE Feldnamen (und die Byte-Offsets links) selbst ein. Groß-/Kleinschreibung egal, Feldnamen im Original wie auf den Folien.</p>`;
+  document.getElementById("pruefScore").innerHTML="";
+  const sel=document.getElementById("pruefSel"); if(sel&&sel.value!==id) sel.value=id;
+}
+function checkPruef(){
+  const ins=document.querySelectorAll("#pruefArea input.gap");let ok=0,tot=0;
+  ins.forEach(i=>{tot++;const good=norm(i.value)===norm(i.dataset.ans);
+    i.classList.toggle("ok",good);i.classList.toggle("no",!good);
+    let f=i.parentNode.querySelector(".ansfix");
+    if(!good){if(!f){f=document.createElement("span");f.className="ansfix";i.parentNode.appendChild(f);}f.textContent="→ "+i.dataset.ans;}
+    else if(f)f.remove();
+    if(good)ok++;});
+  document.getElementById("pruefScore").innerHTML=`<span class="g">${ok}</span> / ${tot} richtig`;
+}
+function showSolPruef(){document.querySelectorAll("#pruefArea input.gap").forEach(i=>{i.value=i.dataset.ans;i.classList.add("ok");i.classList.remove("no");const f=i.parentNode.querySelector(".ansfix");if(f)f.remove();});document.getElementById("pruefScore").innerHTML="Lösung angezeigt";}
+function nextPruef(){const ids=PRUEF_GROUPS.flatMap(g=>g[1]).filter(x=>SCHEMAS[x]);let id=ids[Math.floor(rnd()*ids.length)];if(id===curPruef&&ids.length>1)id=ids[(ids.indexOf(id)+1)%ids.length];loadPruef(id);}
+(function(){
+  const sel=document.getElementById("pruefSel"); if(!sel) return;
+  PRUEF_GROUPS.forEach(([title,ids])=>{const og=document.createElement("optgroup");og.label=title;ids.forEach(id=>{if(!SCHEMAS[id])return;const o=document.createElement("option");o.value=id;o.textContent=SCHEMAS[id].name;og.appendChild(o);});sel.appendChild(og);});
+  sel.addEventListener("change",()=>loadPruef(sel.value));
+  document.getElementById("pruefNext").onclick=nextPruef;
+  document.getElementById("pruefCheck").onclick=checkPruef;
+  document.getElementById("pruefSol").onclick=showSolPruef;
+  document.getElementById("pruefArea").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();checkPruef();}});
+  loadPruef("ipv4");
+})();
 document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
   document.querySelectorAll(".tab").forEach(x=>x.setAttribute("aria-selected",x===t?"true":"false"));
   document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
