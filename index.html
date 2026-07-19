@@ -113,6 +113,26 @@
   .flash .full{font-size:18px;font-weight:700;margin-bottom:8px}
   button.btn:disabled{opacity:.45;cursor:default}
   button.btn.good{background:var(--good);border-color:var(--good);color:#fff}
+  .cbx .exam{background:var(--accent-soft);border:1px solid var(--accent);border-radius:10px;padding:10px 13px;font-size:13.5px;margin:0 0 12px}
+  .cbx .formula{background:var(--surface2);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:9px;padding:11px 14px;margin:9px 0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;overflow-x:auto}
+  .cbx figure{margin:6px 0 14px;text-align:center}
+  .cbx svg{max-width:100%;height:auto}
+  .cbx figcaption{color:var(--muted);font-size:12.5px;margin-top:6px}
+  .cbx .mode{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin:6px 0 12px;font-size:14px}
+  .cbx .mode .k{font-weight:650}
+  .cbx .note{font-size:13px;color:var(--muted);border-top:1px solid var(--line);margin-top:12px;padding-top:10px}
+  .cbx p{margin:0 0 10px} .cbx ul{margin:6px 0 10px;padding-left:20px} .cbx li{margin:3px 0}
+  .cbx .mono{font-family:ui-monospace,Menlo,monospace}
+  .cax{stroke:var(--muted);stroke-width:1.2}
+  .cwmax{stroke:var(--muted);stroke-width:1;stroke-dasharray:4 3}
+  .ccurve{fill:none;stroke:var(--accent);stroke-width:2.6}
+  .crtt{fill:none;stroke:var(--l5);stroke-width:2.4}
+  .cdrop{stroke:var(--bad);stroke-width:2;stroke-dasharray:4 3}
+  .clbl{fill:var(--ink);font:600 12px ui-sans-serif,system-ui,sans-serif}
+  .clblm{fill:var(--muted);font:italic 12px ui-sans-serif,system-ui,sans-serif}
+  .clblb{fill:var(--bad);font:600 11px ui-sans-serif,system-ui,sans-serif}
+  .clbla{fill:var(--accent);font:600 11px ui-sans-serif,system-ui,sans-serif}
+  .clblo{fill:var(--l5);font:600 11px ui-sans-serif,system-ui,sans-serif}
 </style>
 
 <div class="wrap">
@@ -125,6 +145,7 @@
     <button class="tab" role="tab" aria-selected="true" data-p="merk">Merkblatt</button>
     <button class="tab" role="tab" aria-selected="false" data-p="train">Lücken-Training</button>
     <button class="tab" role="tab" aria-selected="false" data-p="cards">Karteikarten</button>
+    <button class="tab" role="tab" aria-selected="false" data-p="cubic">CUBIC &amp; BBR</button>
   </div>
 
   <section class="panel active" id="p-merk"></section>
@@ -165,7 +186,95 @@
         <div class="fcbar"><button class="btn" id="fcReset">Fortschritt zurücksetzen</button></div>
       </div>
     </div>
-  </section>
+
+  <section class="panel" id="p-cubic"><div class="cbx">
+    <div class="card">
+      <div class="exam"><b>Klausurrelevant:</b> In den letzten Klausuren (WS24/25, WS25/26) ist Überlastkontrolle/CUBIC/BBR ein Schwerpunkt (2024/25 waren die Aufgaben 7–10 dazu = 24 Punkte). Gefragt: CUBIC-Formel + Komponenten, Herkunft des Namens, Vergleich mit AIMD; BBR wofür es steht, Formeln (RTTt, BtlBw, RTprop, BDP), die 4 Phasen, die 3 Phasen aus dem Graphen.</div>
+      <h2>Überlastkontrolle – Ansätze</h2>
+      <p class="sub">fol 13, Folie 6</p>
+      <div class="mode">
+        <span class="k">Ende-zu-Ende</span><span>Keine direkte Rückmeldung vom Netz. Die Auslastung wird aus beobachtbaren Parametern (Paketverlust, Verzögerung) geschätzt. → der TCP-Ansatz.</span>
+        <span class="k">Netzgestützt</span><span>Router geben Rückmeldung an Sender/Empfänger (ein Bit signalisiert Überlast, z. B. ECN; oder eine Rate). Beispiele: DECbit, TCP/IP ECN, ATM.</span>
+      </div>
+      <p><b>AIMD</b> (Additive Increase, Multiplicative Decrease): das klassische TCP-Verhalten. Im Congestion Avoidance wächst cwnd <b>linear</b> (+1 pro RTT, additive increase), bei Verlust wird es <b>multiplikativ</b> verkleinert (Faktor β, klassisch ×½). CUBIC und BBR verbessern das für schnelle Netze mit hoher Bandbreite und großer RTT.</p>
+    </div>
+
+    <div class="card">
+      <h2>TCP CUBIC</h2>
+      <p class="sub">fol 13, Folien 27–32</p>
+      <p><b>Was/warum:</b> TCP-Standard in Windows, macOS, Linux. Modelliert das Wachstum des Vorgängers TCP BIC mit einer <b>kubischen Funktion</b> (daher der Name) und ist fair. BIC war zu komplex und zu aggressiv.</p>
+      <figure><svg viewBox="0 0 430 250" role="img" aria-label="CUBIC Wachstumskurve">
+        <line class="cax" x1="48" y1="18" x2="48" y2="205"></line><line class="cax" x1="44" y1="205" x2="402" y2="205"></line>
+        <line class="cwmax" x1="48" y1="119.5" x2="392" y2="119.5"></line><text class="clbl" x="396" y="123">Wmax</text>
+        <line class="cdrop" x1="48" y1="119.5" x2="48" y2="183.6"></line><polygon points="44,178 52,178 48,185" fill="var(--bad)"></polygon>
+        <text class="clblb" x="54" y="160">Verlust:</text><text class="clblb" x="54" y="173">cwnd·(1−β)</text>
+        <line class="cwmax" x1="216" y1="119.5" x2="216" y2="205" style="stroke-dasharray:2 3"></line><text class="clblm" x="210" y="220">K</text>
+        <text class="clblm" x="150" y="108">Plateau ≈ Wmax</text>
+        <polyline class="ccurve" points="48.0,183.6 56.4,174.5 64.8,166.2 73.2,158.9 81.6,152.3 90.0,146.6 98.4,141.5 106.8,137.1 115.2,133.4 123.6,130.2 132.0,127.5 140.4,125.3 148.8,123.6 157.2,122.2 165.6,121.2 174.0,120.5 182.4,120.0 190.8,119.7 199.2,119.6 207.6,119.5 216.0,119.5 224.4,119.5 232.8,119.4 241.2,119.3 249.6,119.0 258.0,118.5 266.4,117.8 274.8,116.8 283.2,115.4 291.6,113.7 300.0,111.5 308.4,108.8 316.8,105.6 325.2,101.9 333.6,97.5 342.0,92.4 350.4,86.7 358.8,80.1 367.2,72.8 375.6,64.5 384.0,55.4"></polyline>
+        <text class="clblm" x="96" y="196">konkav</text><text class="clblm" x="330" y="196">konvex</text>
+        <text class="clblm" x="330" y="234">Zeit t seit Verlust</text><text class="clblm" x="20" y="112" transform="rotate(-90 20 112)">cwnd</text>
+      </svg><figcaption>Nach dem Verlust: cwnd um β reduziert, dann kubisch: konkav → Plateau um Wmax → konvex.</figcaption></figure>
+      <p><b>Wachstumsfunktion</b> (Folie 28):</p>
+      <div class="formula">W(t) = C · (t − K)³ + Wmax</div>
+      <ul>
+        <li><b>Wmax</b> — cwnd vor dem letzten Paketverlust.</li>
+        <li><b>t</b> — Zeit seit dem letzten Verlust.</li>
+        <li><b>K</b> — Zeit bis W wieder Wmax erreicht: <span class="mono">K = ∛(Wmax·β / C)</span>.</li>
+        <li><b>C</b> — Konstante (Skalierung). <b>β</b> — Reduktionsfaktor bei Verlust.</li>
+      </ul>
+      <p><b>Drei Modi</b> (Folie 29):</p>
+      <div class="mode">
+        <span class="k">TCP-Modus</span><span>cwnd &lt; W<sub>tcp</sub>(t): wächst wie Standard-TCP (AIMD), damit es bei kleiner Bandbreite/RTT nicht langsamer ist.</span>
+        <span class="k">Konkav</span><span>cwnd &lt; Wmax.</span>
+        <span class="k">Konvex</span><span>cwnd &gt; Wmax.</span>
+      </div>
+      <p><b>Zuwachs pro ACK</b> (außerhalb TCP-Modus, Folie 31):</p>
+      <div class="formula">cwnd += ( W(t + RTT) − cwnd ) / cwnd</div>
+      <p><b>Bei Verlust:</b> cwnd um β verkleinert. <b>Fast Convergence:</b> ist cwnd kleiner als das vorherige Wmax, nimmt CUBIC einen neuen Fluss an und senkt Wmax zusätzlich (gibt Bandbreite frei).</p>
+      <p><b>Vergleich mit AIMD:</b> CUBIC ersetzt das lineare AIMD-Wachstum durch die kubische Kurve, nach einem Verlust erst schnell (konkav), vorsichtig um Wmax (Plateau), dann wieder aggressiv (konvex). Im TCP-Modus mindestens so schnell wie AIMD → nutzt hohe Bandbreite bei großer RTT deutlich besser aus.</p>
+      <p class="note">Hinweis Folie 31: dort steht „W<sub>max</sub>(t+RTT) − cWnd / cWnd". Sauber ist <b>W</b>(t+RTT) (die kubische Funktion, nicht die Konstante) und mit Klammern: <span class="mono">(W(t+RTT) − cwnd)/cwnd</span>.</p>
+    </div>
+
+    <div class="card">
+      <h2>TCP BBR</h2>
+      <p class="sub">fol 13, Folien 38–51</p>
+      <p><b>Wofür steht BBR:</b> <b>Bottleneck Bandwidth and Round-trip propagation time</b>. Von Google. Reagiert auf <b>Überlast</b> (steigende Verzögerung), nicht auf Paketverlust → hoher Durchsatz, Stabilität und Fairness ohne Bufferbloat. Genutzt im WAN von Google (Suche, YouTube via QUIC/HTTP/3).</p>
+      <p><b>Kenngrößen</b> (Folie 40):</p>
+      <ul>
+        <li><b>BtlBw</b> — Bottleneck Bandwidth: Bandbreite am Flaschenhals.</li>
+        <li><b>RTprop</b> — Round-Trip Propagation Time: RTT ohne Störungen/Verarbeitung.</li>
+        <li><b>BDP = BtlBw · RTprop</b> — max. Daten unterwegs ohne Überlast (= Kleinrocks optimaler Arbeitspunkt).</li>
+      </ul>
+      <p><b>Schätzformeln</b> (Folie 46):</p>
+      <div class="formula">RTT(t) = RTprop + η(t) ,  η ≥ 0  (Störungen)
+RTprop = min( RTT(t) )        (kleinste gemessene RTT)
+BtlBw  = max( delivery rate )  (größte gemessene Lieferrate)</div>
+      <p><b>Betriebspunkte / die „3 Phasen aus dem Graphen"</b> (Folien 43–45):</p>
+      <figure><svg viewBox="0 0 440 252" role="img" aria-label="BBR Betriebspunkte">
+        <line class="cax" x1="55" y1="20" x2="55" y2="210"></line><line class="cax" x1="50" y1="210" x2="412" y2="210"></line>
+        <line class="cwmax" x1="55" y1="64" x2="392" y2="64"></line><text class="clblm" x="396" y="68">BtlBw</text>
+        <line class="cwmax" x1="55" y1="176" x2="392" y2="176"></line><text class="clblm" x="396" y="180">RTprop</text>
+        <line class="cwmax" x1="200" y1="55" x2="200" y2="210" style="stroke-dasharray:2 3"></line>
+        <polyline class="ccurve" points="55,196 200,64 390,64"></polyline><text class="clbla" x="110" y="118">Durchsatz</text>
+        <polyline class="crtt" points="55,176 200,176 390,104"></polyline><text class="clblo" x="322" y="126">RTT</text>
+        <text class="clblm" x="92" y="205">app-limited</text><text class="clblm" x="300" y="205">buffer-limited</text>
+        <text class="clbla" x="176" y="48">BBR: optimal (BDP)</text><text class="clblb" x="330" y="98">verlustbasiert (CUBIC)</text>
+        <text class="clblm" x="250" y="242">Daten unterwegs (inflight)</text>
+      </svg><figcaption>BBR zielt auf den optimalen Punkt (Durchsatz = BtlBw UND RTT = RTprop, also BDP) und <b>vermeidet</b> aktiv den buffer-limited-Bereich, in dem verlustbasierte Verfahren (CUBIC) arbeiten.</figcaption></figure>
+      <div class="mode">
+        <span class="k">app-limited</span><span>Anwendung sendet weniger als die Bandbreite zulässt → RTT = RTprop (kein Stau).</span>
+        <span class="k">bandwidth-limited</span><span>Bandbreite voll ausgenutzt → delivery rate = BtlBw; darüber beginnt die RTT zu steigen. <b>Hier arbeitet BBR</b> (am optimalen Punkt BDP).</span>
+        <span class="k">buffer-limited</span><span>Puffer voll → hier arbeiten verlustbasierte Verfahren bis zum Verlust. <b>Diesen Bereich vermeidet BBR aktiv.</b></span>
+      </div>
+      <p><b>Die 4 Phasen</b> (Folien 47–50):</p>
+      <div class="mode">
+        <span class="k">Startup</span><span>Schnell die BtlBw finden; Senderate exponentiell (wie Slow Start). Wechsel zu Drain, sobald die Lieferrate nicht mehr steigt.</span>
+        <span class="k">Drain</span><span>In Startup aufgebaute Warteschlangen abbauen; Senderate unter die geschätzte BtlBw, bis die RTT wieder ihr Minimum erreicht.</span>
+        <span class="k">ProbeBW</span><span>Prüfen, ob mehr Bandbreite da ist. Zyklus aus 8 Runden: 6× ProbeCruise (mit BtlBw), ProbeUp (kurz erhöhen), ProbeDown (wieder senken).</span>
+        <span class="k">ProbeRTT</span><span>Minimale RTT neu messen; Senderate auf 4 Pakete reduzieren; tritt ein, wenn 10 s kein neuer RTT-Minimalwert. Danach zurück zu ProbeBW.</span>
+      </div>
+    </div>
+  </div></section>
 </div>
 
 <script>
