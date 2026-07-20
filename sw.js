@@ -1,4 +1,4 @@
-const C = "ks-lern-v10";
+const C = "ks-lern-v11";
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg"];
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(C).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
